@@ -85,7 +85,7 @@
     <fieldtype name="numericID" class="solr.TextField" positionIncrementGap="1000" omitNorms="true">
     <analyzer>
       <tokenizer class="solr.KeywordTokenizerFactory"/>
-      <filter class="solr.PatternReplaceFilterFactory" pattern="^.*?(\p{N}[\p{N}\-\.]{5,}\p{N}[xX]?).*$" replacement="***$1"/>
+      <filter class="solr.PatternReplaceFilterFactory" pattern="^.*?(\p{N}[\p{N}\-\.]{6,}[xX]?).*$" replacement="***$1"/>
       <filter class="solr.PatternReplaceFilterFactory" pattern="^[^\*].*$" replacement=""/>
       <filter class="solr.PatternReplaceFilterFactory" pattern="^\*\*\*" replacement=""/>
       <filter class="solr.LowerCaseFilterFactory"/>
@@ -104,7 +104,7 @@
   
   
   <uniqueKey>id</uniqueKey>
-  <defaultSearchField>text</defaultSearchField>
+  <defaultSearchField>id</defaultSearchField>
   <solrQueryParser defaultOperator="OR"/>
   
 </schema>
