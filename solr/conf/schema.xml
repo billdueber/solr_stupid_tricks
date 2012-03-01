@@ -232,7 +232,7 @@
                Throw away everything else, and stick a '***' on the front as an anchor
                -->
           <filter class="solr.PatternReplaceFilterFactory"
-                    pattern="^.*?(\p{N}[\p{N}\-\.]{4,}\p{N}[xX]?).*$" replacement="***$1"
+                    pattern="^.*?(\p{N}[\p{N}\-\.]{6,}\p{N}[xX]?).*$" replacement="***$1"
           />
           
           <!-- This is a little silly, but basically we find anything that does *not*
