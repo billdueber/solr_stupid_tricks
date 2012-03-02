@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema name="mirlyn" version="1.4">
+  <types>
+    
+    <!--
+      #########################
+      #### Stock solr types ###
+      #########################
+    -->
+
+  
+    <!-- Numeric -->
+    <fieldType name="int" class="solr.TrieIntField" precisionStep="0" omitNorms="true" positionIncrementGap="0"/>
+    <fieldType name="float" class="solr.TrieFloatField" precisionStep="0" omitNorms="true" positionIncrementGap="0"/>
+    <fieldType name="long" class="solr.TrieLongField" precisionStep="0" omitNorms="true" positionIncrementGap="0"/>
+    <fieldType name="double" class="solr.TrieDoubleField" precisionStep="0" omitNorms="true" positionIncrementGap="0"/>
+    <fieldType name="tint" class="solr.TrieIntField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
+    <fieldType name="tfloat" class="solr.TrieFloatField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
+    <fieldType name="tlong" class="solr.TrieLongField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
+    <fieldType name="tdouble" class="solr.TrieDoubleField" precisionStep="8" omitNorms="true" positionIncrementGap="0"/>
+
+    <!-- Date/Time
+    
+         The format for this date field is of the form 1995-12-31T23:59:59Z, and
+         is a more restricted form of the canonical representation of dateTime
+         http://www.w3.org/TR/xmlschema-2/#dateTime    
+         The trailing "Z" designates UTC time and is mandatory.
+         Optional fractional seconds are allowed: 1995-12-31T23:59:59.999Z
+         All other components are mandatory.
+
+         Expressions can also be used to denote calculations that should be
+         performed relative to "NOW" to determine the value, ie...
+
+               NOW/HOUR
+                  ... Round to the start of the current hour
+               NOW-1DAY
+                  ... Exactly 1 day prior to now
+               NOW/DAY+6MONTHS+3DAYS
+                  ... 6 months and 3 days in the future from the start of
+                      the current day
+                      
+         Consult the DateField javadocs for more information.
+
+         Note: For faster range queries, consider the tdate type
+      -->
+    <fieldType name="date" class="solr.TrieDateField" omitNorms="true" precisionStep="0" positionIncrementGap="0"/>
+
+    <!-- A Trie based date field for faster date range queries and date faceting. -->
+    <fieldType name="tdate" class="solr.TrieDateField" omitNorms="true" precisionStep="6" positionIncrementGap="0"/>
+    
+    <!-- boolean type: "true" or "false" -->
+    <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
+    
+    <!--Binary data type. The data should be sent/retrieved in as Base64 encoded Strings -->
+    <fieldtype name="binary" class="solr.BinaryField"/>
+    
+    <!-- Ignored -->
+    <fieldtype name="ignored" stored="false" indexed="false" multiValued="true" class="solr.StrField" />
+    
+     <!-- A specialized field for geospatial search. If indexed, this fieldType must not be multivalued. -->
+     <fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coordinate"/>
+
+    <!--
+     A Geohash is a compact representation of a latitude longitude pair in a single field.
+     See http://wiki.apache.org/solr/SpatialSearch
+    -->
+     <fieldtype name="geohash" class="solr.GeoHashField"/>
+    
+    <!-- String -->
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+    
+    
+    
+    <!--
+      ######################################
+      ########### Text Types   #############
+      ######################################
+      
+    -->
+    
+    <!-- text - A standard text type, with icu tokenization and unicode normalization. 
+           - With the ICUFolding, we get:
+             + NFKC normalization (precomosing), 
+             + Unicode case folding (i.e., lowercasing)
+             + search term folding (removing accents, etc).
+           - Synonyms can be put in syn.txt (see sample synonyms.txt file in solr example)
+           - Word delimiter splits on CaseChange and numbers (e.g., code4lib).
+           - The CJK stuff produces bigrams for those languages
+           - Remove Duplicates does what it says on the tin.
+    -->
+    <fieldtype name="text" class="solr.TextField" positionIncrementGap="1000">
+      <analyzer>
+        <tokenizer class="solr.ICUTokenizerFactory"/>
+          <filter class="solr.ICUFoldingFilterFactory"/>
+          <filter class="solr.SynonymFilterFactory" synonyms="syn.txt" ignoreCase="true" expand="false"/>
+          <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0"/>
+          <filter class="solr.CJKWidthFilterFactory"/>
+          <filter class="solr.CJKBigramFilterFactory"/> 
+          <filter class="solr.TrimFilterFactory"/>       
+          <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldtype>
+    
+    <!-- same as text, but with some stemming thrown in -->
+    <fieldtype name="text_stemmed" class="solr.TextField" positionIncrementGap="1000">
+      <analyzer>
+        <tokenizer class="solr.ICUTokenizerFactory"/>
+          <filter class="solr.ICUFoldingFilterFactory"/>
+          <filter class="solr.KStemFilterFactory"/>
+          <filter class="solr.SynonymFilterFactory" synonyms="syn.txt" ignoreCase="true" expand="false"/>
+          <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0"/>
+          <filter class="solr.CJKWidthFilterFactory"/>
+          <filter class="solr.CJKBigramFilterFactory"/>
+          <filter class="solr.TrimFilterFactory"/>     
+          <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldtype>
+    
+    <!-- text_(l|r|lr):  text that is anchored on one or both ends.
+         These are useful for phrase searches only; for non-phrase searches we're
+         basically just adding one or two useless tokens to the mix.
+         
+         It's mostly the same as text, but with the addition of one or
+         two anchors. We don't stem these. 
+         
+         text_lr is essentially an "exact match" where "exact" means
+         "...except for runs of spaces, case, diacritics, and most punctuation".
+         I find it useful for boosting the bejeebus out of exact title matches.
+    -->
+    
+    <fieldtype name="text_l" class="solr.TextField" positionIncrementGap="1000">
+      <analyzer>
+        <tokenizer class="solr.ICUTokenizerFactory"/>
+          <filter class="solr.ICUFoldingFilterFactory"/>
+          <filter class="solr.SynonymFilterFactory" synonyms="syn.txt" ignoreCase="true" expand="false"/>
+          <filter class="solr.CJKWidthFilterFactory"/>
+          <filter class="solr.CJKBigramFilterFactory"/> 
+          <filter class="solr.TrimFilterFactory"/>
+          <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="\p{Z}+" replacement=" "
+          />
+          <charFilter class="solr.PatternReplaceCharFilterFactory"
+            pattern="^(.*)$" replacement="AAAA $1" />       
+          <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldtype>
+          
+    <fieldtype name="text_r" class="solr.TextField" positionIncrementGap="1000">
+      <analyzer>
+        <tokenizer class="solr.ICUTokenizerFactory"/>
+          <filter class="solr.ICUFoldingFilterFactory"/>
+          <filter class="solr.SynonymFilterFactory" synonyms="syn.txt" ignoreCase="true" expand="false"/>
+          <filter class="solr.CJKWidthFilterFactory"/>
+          <filter class="solr.CJKBigramFilterFactory"/> 
+          <filter class="solr.TrimFilterFactory"/>
+          <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="\p{Z}+" replacement=" "
+          />
+          <charFilter class="solr.PatternReplaceCharFilterFactory"
+            pattern="^(.*)$" replacement="$1 ZZZZ" />       
+          <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldtype>
+    
+    <!-- text_fullanchored anchors on both ends and is basically a more forgiving
+        "exact match"
+    -->
+    
+    <fieldtype name="text_lr" class="solr.TextField" positionIncrementGap="1000">
+      <analyzer>
+        <tokenizer class="solr.ICUTokenizerFactory"/>
+          <filter class="solr.ICUFoldingFilterFactory"/>
+          <filter class="solr.SynonymFilterFactory" synonyms="syn.txt" ignoreCase="true" expand="false"/>
+          <filter class="solr.CJKWidthFilterFactory"/>
+          <filter class="solr.CJKBigramFilterFactory"/> 
+          <filter class="solr.TrimFilterFactory"/>
+          <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="\p{Z}+" replacement=" "
+          />
+          <charFilter class="solr.PatternReplaceCharFilterFactory"
+            pattern="^(.*)$" replacement="AAAA $1 ZZZZ" />       
+          <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldtype>
+    
+    
+    <!--
+      saneString: a string for exact matches, but trim, fold multiple spaces,
+      and ditch some closing punctuation. Designed for facets where the 
+      values might not be as controlled as you'd like (e.g., LCSH)
+      
+      Note that you might want to facet on saneString, but allow searches against
+      text_lr, since the latter does lowercasing, synonyms, and 
+      unicode folding.
+    -->
+    
+    <fieldtype name="sane_string" class="solr.TextField"  positionIncrementGap="1000" omitNorms="true">
+      <analyzer>
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+          <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="(.*?)[ ,.!?/]+$" replacement="$1"
+          />
+          <filter class="solr.TrimFilterFactory"/>
+          <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="\p{Z}+" replacement=" "
+          />
+      </analyzer>
+    </fieldtype>
+    
+    <!--
+       ###################################################
+       ##########  Useful library types  ################
+       ##################################################
+       
+    -->
+    
+    <!-- numericID: 
+           - take the first string of digits/dashes/dots and an optional X or x
+             that is at least six characters long (OCLC, ISBN, ISSN, etc.)
+             and throw away everything that's left
+           - lowercase it (i.e., turn any trailing X into an x)
+           - ditch everything that's not a number or an 'x'
+           - 
+           - ditch any leading zeros
+    -->
+    
+    <fieldtype name="numericID" class="solr.TextField" positionIncrementGap="1000" omitNorms="true">
+      <analyzer>
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+          <!-- Start by finding the first substring that starts with a digit, ends with a digit, and
+               has at least four digits in-between, followed by an optional X 
+               Throw away everything else, and stick a '***' on the front as an anchor
+               -->
+          <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="^.*?(\p{N}[\p{N}\-\.]{4,}\p{N}[xX]?).*$" replacement="***$1"
+          />
+          
+          <!-- This is a little silly, but basically we find anything that does *not*
+               start with '*' and throw it all away, on the basis that if it had contained
+               a valid number, it would start with a '*' due to the pattern replacement
+               above. The '*' is nice in that it's a wildcard character and will throw an 
+               error if your search actually *does* start with it. -->
+          
+          <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="^[^\*].*$" replacement=""
+          />
+          
+          <!-- Get rid of the '***' -->
+          
+          <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="^\*\*\*" replacement=""
+          />
+
+          <!-- Lowercase it and get rid of anything that's not a number or an 'x' -->
+          <filter class="solr.LowerCaseFilterFactory"/>
+          <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="[^\p{N}x]" replacement="" replace="all"
+          />
+
+          <!-- Throw away everything that's not long enough anymore (e.g., at least five
+               digits plus an optional 'x', or six digits). This will include stuff from the
+               second step that got reduced to the empty string. -->
+          <filter class="solr.LengthFilterFactory" min="8" max="100" />
+          
+          
+          <!-- Finally, get rid of leading zeros -->
+          <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="^0*" replacement=""
+          />
+        </analyzer>
+      </fieldtype>
+      
+      <!-- csn (comma-separated numbers) is a list of numbers, separated by commas. Do basically
+           the same transform as numericID, but in this case allow
+           commas to separate values.
+           
+           This is more restrictive than numericID, obviously, in that we can't
+           allow there to be commas in the input
+      -->
+      <fieldtype name="csn" class="solr.TextField" positionIncrementGap="100" omitNorms="true">
+        <analyzer>
+          <tokenizer class="solr.PatternTokenizerFactory" pattern="\s*,\s*" />
+            <filter class="solr.PatternReplaceFilterFactory"
+                      pattern="^.*?(\p{N}[\p{N}\-\.]{4,}\p{N}[xX]?).*$" replacement="***$1"
+            />
+             <filter class="solr.PatternReplaceFilterFactory"
+                      pattern="^[^\*].*$" replacement=""
+            />
+            <filter class="solr.PatternReplaceFilterFactory"
+                      pattern="\*\*\*" replacement=""
+            />
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.PatternReplaceFilterFactory"
+                      pattern="[^\p{N}x]" replacement="" replace="all"
+            />
+            <filter class="solr.LengthFilterFactory" min="8" max="100" />
+            
+            <filter class="solr.PatternReplaceFilterFactory"
+                      pattern="^0*" replacement=""
+            />
+        </analyzer>
+      </fieldtype>
+           
+      <!-- callnoprefix: use edgengram to index every left-anchored substring
+           of the call number, throwing away spaces and dots
+      -->
+      
+      <fieldtype name="callnoprefix" class="solr.TextField" omitNorms="true">
+        <analyzer>
+          <tokenizer class="solr.KeywordTokenizerFactory"/>
+          <filter class="solr.LowerCaseFilterFactory"/>
+          <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="[\p{Z}\.]" replacement="" replace="all"
+          />
+          <filter class="solr.EdgeNGramFilterFactory" minGramSize="1" maxGramSize="15" side="front"/>
+        </analyzer>
+      </fieldtype>
+                  
+          
+          
+    
+  </types>
+  
+  <fields>
+    <field name="id" type="string" indexed="true" stored="true" />
+    <field name="sane" type="sane_string" indexed="true" stored="true"/>
+    <field name="text" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="tf" type="text_lr" indexed="true" stored="true" multiValued="true" />
+    <field name="tl" type="text_l" indexed="true" stored="true" multiValued="true" />
+    <field name="tr" type="text_r" indexed="true" stored="true" multiValued="true" />
+    <field name="numeric" type="numericID" indexed="true" stored="true"  multiValued="true" />
+    <field name="csn" type="csn" indexed="true" stored="true" multiValued="true" />
+    <field name="name" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="othername" type="text" indexed="true" stored="true" multiValued="true" />
+    
+  </fields>
+  
+  
+  <uniqueKey>id</uniqueKey>
+  <defaultSearchField>text</defaultSearchField>
+  <solrQueryParser defaultOperator="OR"/>
+  
+</schema>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
