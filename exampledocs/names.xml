@@ -14,23 +14,20 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<update>
+  <delete><query>*:*</query></delete>
+  <commit/>
+  <add>
+    <doc>
+      <field name="id">1</field>
+      <field name="name_text">William John James Dueber</field>
+      <field name="name_text">Rufus Xavier Sarsparella</field>  
+    </doc>
+    <doc>
+      <field name="id">2</field>
+      <field name="name_text">Mike Dueber</field>
+      <field name="name_text">William Penn</field>  
+    </doc>
+  </add>
 
-<add>
-<doc>
-  <field name="id">SP2514N</field>
-  <field name="text">Just a test of the anchor</field>
-  <field name="tf">Just a test of the anchor</field>
-  <field name="tl">Just a test of the anchor</field>
-  <field name="tr">Just a test of the anchor</field>
-  <field name="numeric">ISBN13: 12345-2234X (behind stacks from 1990)</field>
-  <field name="numeric">ISBN134455</field>
-  <field name="csn">1234-5678, 11223344, 123456-89-9X, 111</field>
-  <field name="name">William James John Dueber</field>
-  <field name="name">Jesus H. Tapdancing Christ on a pogo stick with his sister nancy</field>
-  <field name="othername">Rufus Xavier Sarsaparilla</field>
-  <field name="othername">Jumping Jack Flash</field>
-  
-</doc>
-
-</add>
-
+</update>

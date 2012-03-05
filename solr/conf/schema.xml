@@ -95,11 +95,37 @@
     </analyzer>
     </fieldtype>       
     
+    <!-- text - A standard text type, with icu tokenization and unicode normalization. 
+           - With the ICUFolding, we get:
+             + NFKC normalization (precomosing), 
+             + Unicode case folding (i.e., lowercasing)
+             + search term folding (removing accents, etc).
+           - Synonyms can be put in syn.txt (see sample synonyms.txt file in solr example)
+           - Word delimiter splits on CaseChange and numbers (e.g., code4lib).
+           - The CJK stuff produces bigrams for those languages
+           - Remove Duplicates does what it says on the tin.
+    -->
+    <fieldtype name="text" class="solr.TextField" positionIncrementGap="1000">
+      <analyzer>
+        <tokenizer class="solr.ICUTokenizerFactory"/>
+          <filter class="solr.ICUFoldingFilterFactory"/>
+          <filter class="solr.SynonymFilterFactory" synonyms="syn.txt" ignoreCase="true" expand="false"/>
+          <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0"/>
+          <filter class="solr.CJKWidthFilterFactory"/>
+          <filter class="solr.CJKBigramFilterFactory"/> 
+          <filter class="solr.TrimFilterFactory"/>       
+          <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldtype>
+    
+    
+    
   </types>
   
   <fields>
     <field name="id" type="string" indexed="true" stored="true" />
-    <field name="*_numeric" type="numericID" indexed="true" stored="true" multiValued="true"/>    
+    <dynamicField name="*_numeric" type="numericID" indexed="true" stored="true" multiValued="true"/>   
+    <dynamicField name="*_text" type="text" indexed="true" stored="true" multiValued="true"/>   
   </fields>
   
   
