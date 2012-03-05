@@ -1,0 +1,4 @@
+<update>
+  <delete><query>*:*</query></delete>
+  <commit/>
+</update>
