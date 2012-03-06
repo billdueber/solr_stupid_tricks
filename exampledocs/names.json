@@ -1,0 +1,14 @@
+{
+  "add": {
+    "doc": {
+      "id": "1",
+      "name_text": ["William John Dueber", "David Thomas Jones"]
+    }
+  },
+  "add": {
+    "doc": {
+      "id": 2,
+      "name_text": ["Mike Dueber", "William Penn"]
+    }
+  }
+}

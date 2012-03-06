@@ -15,14 +15,20 @@
 # limitations under the License.
 
 FILES=$*
-URL=http://localhost:8983/solr/update
+URL='http://localhost:8983/solr/update/json?wt=json'
 
+# Clear it out
+echo
+echo "Clearing out solr (delete all)"
+curl $URL -s -d '{"delete": { "query":"*:*" }, "commit": {}}' -H 'Content-type:application/json' > /dev/null
+
+echo 'Posting file(s)'
 for f in $FILES; do
-  echo Posting file $f to $URL
-  curl $URL --data-binary @$f -H 'Content-type:application/xml' 
-  echo
+  echo "  - $f"
+  curl $URL -s -d @$f -H 'Content-type:application/json' > /dev/null
 done
 
 #send the commit command to make sure all the changes are flushed and visible
-curl $URL --data-binary '<commit/>' -H 'Content-type:application/xml'
+echo "Final commit"
+curl $URL -s -d '{"commit": {}}' -H 'Content-type:application/json' > /dev/null
 echo
