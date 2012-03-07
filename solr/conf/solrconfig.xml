@@ -703,6 +703,21 @@
        not be initialized until the first request that uses it.
 
     -->
+    
+  <!-- Dismax OR handler with AND boost -->
+  <requestHandler name="/edismaxplus" class="solr.SearchHandler">
+    <lst name="defaults">
+      <str name="rows">10</str>
+      <str name="fl">*,score</str>
+      <str name="echoParams">explicit</str>
+      <str name="q">_query_:"{!edismax qf=$fields mm=$mymm v=$qwords bq=$boostForAll}"</str>
+      <str name='mymm'>0%</str>
+      <str name='boostForAll'>_query_:"{!edismax qf=$fields mm='100%' v=$qwords }"^5</str>
+    </lst>
+  </requestHandler>
+      
+        
+    
   <!-- SearchHandler
 
        http://wiki.apache.org/solr/SearchHandler
