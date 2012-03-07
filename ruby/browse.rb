@@ -47,12 +47,10 @@ end
 
 
 if __FILE__ == $0
-  b = Browse.new('http://mirlyn.lib.umich.edu/Search/Home?')
-  if defined? JRUBY_VERSION
-    b.browse({'lookfor' => 'jruby'})
-  else 
-    b.browse({'lookfor' => 'ruby'})
-  end
+  require 'json'
+  b = Browse.new('http://localhost:8983/solr/select/?')
+  args = eval(File.open(ARGV[0]).read)
+  b.browse args
 end
   
     
