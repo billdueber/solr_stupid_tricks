@@ -125,7 +125,9 @@
   <fields>
     <field name="id" type="string" indexed="true" stored="true" />
     <dynamicField name="*_numeric" type="numericID" indexed="true" stored="true" multiValued="true"/>   
-    <dynamicField name="*_text" type="text" indexed="true" stored="true" multiValued="true"/>   
+    <dynamicField name="*_text" type="text" indexed="true" stored="true" multiValued="true"/>
+    <field name="author" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="title" type="text" indexed="true"  stored="true" multiValued="true" />
   </fields>
   
   
