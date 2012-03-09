@@ -712,10 +712,13 @@
       <str name="echoParams">explicit</str>
       <str name="q">_query_:"{!edismax qf=$fields mm=$mymm v=$qwords bq=$boostForAll}"</str>
       <str name='mymm'>0%</str>
-      <str name='boostForAll'>_query_:"{!edismax qf=$fields mm='100%' v=$qwords }"^5</str>
+      <str name="qwordsphrase">"JunkThatWillNEverShowUpInAMillionFreakinYears"</str>
+      <str name='boostForAll'>
+        _query_:"{!edismax qf=$fields mm='100%' v=$qwords }"^5 OR
+        _query_:"{!dismax  qf=$fields mm='100%' v=$qwordsphrase qs='999'}"^5
+      </str>
     </lst>
   </requestHandler>
-      
         
     
   <!-- SearchHandler

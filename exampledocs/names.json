@@ -1,14 +1,12 @@
-{
-  "add": {
-    "doc": {
-      "id": "1",
-      "name_text": ["William John Dueber", "David Thomas Jones"]
-    }
+[
+  {
+    "id": "1",
+    "title": "The Monkees",
+    "name_text": ["Peter Tork", "Mike Nesmith", "Micky Dolenz", "Davy Thomas Jones"]
   },
-  "add": {
-    "doc": {
-      "id": 2,
-      "name_text": ["Mike Dueber", "William Penn"]
-    }
+  {
+    "id": "2",
+    "title": "Heros of the Wild West",
+    "name_text": ["Buck Jones", "Davy Crockett"]
   }
-}
+]
