@@ -36,21 +36,33 @@ class Browse
     return @root + args.map{|k,v| "#{k}=#{CGI::escape(v)}"}.join('&')
   end
   
-  def jruby_browse args={}
+  def jruby_browse args={}, forcetype=nil
+    if forcetype
+      args['wt'] = forcetype
+    end
     @@desktop.browse(Java::java.net.URI.new(urlify args))
   end
   
-  def browse args={}
+  def browse args={}, forcetype = nil
+    if forcetype
+      args['wt'] = forcetype
+    end
     Launchy.open urlify(args)
   end
 end
 
 
 if __FILE__ == $0
+  unless ARGV.size > 0
+    puts "\nusage: ruby browse.rb jsonfile   OR"
+    puts   "       ruby browse.rb jsonfile [json|csv|standard|xml]"
+    exit
+  end
   require 'json'
   b = Browse.new('http://localhost:8983/solr/select/?')
   args = eval(File.open(ARGV[0]).read)
-  b.browse args
+  ARGV[1] = 'standard' if ARGV[1] == 'xml'
+  b.browse args, ARGV[1]
 end
   
     
