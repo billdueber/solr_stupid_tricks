@@ -118,6 +118,43 @@
       </analyzer>
     </fieldtype>
     
+    <!-- text_lr anchors on both ends and is basically a more forgiving
+        "exact match"
+    -->
+    
+    <fieldtype name="text_lr" class="solr.TextField" positionIncrementGap="1000">
+      <analyzer>
+        <tokenizer class="solr.ICUTokenizerFactory"/>
+          <filter class="solr.ICUFoldingFilterFactory"/>
+          <filter class="solr.SynonymFilterFactory" synonyms="syn.txt" ignoreCase="true" expand="false"/>
+          <filter class="solr.CJKWidthFilterFactory"/>
+          <filter class="solr.CJKBigramFilterFactory"/> 
+          <filter class="solr.TrimFilterFactory"/>
+          <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="\p{Z}+" replacement=" "
+          />
+          <charFilter class="solr.PatternReplaceCharFilterFactory"
+            pattern="^(.*)$" replacement="AAAA $1 ZZZZ" />       
+          <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldtype>
+    
+    <fieldtype name="text_l" class="solr.TextField" positionIncrementGap="1000">
+      <analyzer>
+        <tokenizer class="solr.ICUTokenizerFactory"/>
+          <filter class="solr.ICUFoldingFilterFactory"/>
+          <filter class="solr.SynonymFilterFactory" synonyms="syn.txt" ignoreCase="true" expand="false"/>
+          <filter class="solr.CJKWidthFilterFactory"/>
+          <filter class="solr.CJKBigramFilterFactory"/> 
+          <filter class="solr.TrimFilterFactory"/>
+          <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="\p{Z}+" replacement=" "
+          />
+          <charFilter class="solr.PatternReplaceCharFilterFactory"
+            pattern="^(.*)$" replacement="AAAA $1" />       
+          <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldtype>
     
     
   </types>
@@ -128,6 +165,14 @@
     <dynamicField name="*_text" type="text" indexed="true" stored="true" multiValued="true"/>
     <field name="author" type="text" indexed="true" stored="true" multiValued="true" />
     <field name="title" type="text" indexed="true"  stored="true" multiValued="true" />
+    <field name="title_exact" type="text_lr" indexed="true" stored="true" multiValued="true"/>
+    <field name="title_l" type="text_l" indexed="true" stored="true" multiValued="true"/>
+    <field name="num" type="numericID" indexed="true" stored="true" multiValued="true"/>  
+    
+    <copyField source="title" dest="title_exact"/>
+    <copyField source="title" dest="title_l"/>
+    
+    
   </fields>
   
   
