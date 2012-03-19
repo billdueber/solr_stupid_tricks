@@ -55,14 +55,16 @@ end
 if __FILE__ == $0
   unless ARGV.size > 0
     puts "\nusage: ruby browse.rb jsonfile   OR"
-    puts   "       ruby browse.rb jsonfile [json|csv|standard|xml]"
+    puts   "       ruby browse.rb jsonfile [json|csv|standard|xml] OR"
     exit
   end
-  require 'json'
   b = Browse.new('http://localhost:8983/solr/select/?')
   args = eval(File.open(ARGV[0]).read)
   ARGV[1] = 'standard' if ARGV[1] == 'xml'
-  b.browse args, ARGV[1]
+  unless args.kind_of? Array
+    args = [args]
+  end
+  args.each {|a| b.browse a, ARGV[1]}
 end
   
     
