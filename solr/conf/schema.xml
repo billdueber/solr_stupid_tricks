@@ -103,7 +103,6 @@
            - Synonyms can be put in syn.txt (see sample synonyms.txt file in solr example)
            - Word delimiter splits on CaseChange and numbers (e.g., code4lib).
            - The CJK stuff produces bigrams for those languages
-           - Remove Duplicates does what it says on the tin.
     -->
     <fieldtype name="text" class="solr.TextField" positionIncrementGap="1000">
       <analyzer>
@@ -113,8 +112,6 @@
           <!-- <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0"/> -->
           <filter class="solr.CJKWidthFilterFactory"/>
           <filter class="solr.CJKBigramFilterFactory"/> 
-          <filter class="solr.TrimFilterFactory"/>       
-          <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
     </fieldtype>
     
@@ -124,32 +121,25 @@
     
     <fieldtype name="text_lr" class="solr.TextField" positionIncrementGap="1000">
       <analyzer>
+        <charFilter class="solr.PatternReplaceCharFilterFactory"
+          pattern="^(.*)$" replacement="AAAA $1 ZZZZ" />       
         <tokenizer class="solr.ICUTokenizerFactory"/>
-          <charFilter class="solr.PatternReplaceCharFilterFactory"
-            pattern="^(.*)$" replacement="AAAA $1 ZZZZ" />       
           <filter class="solr.ICUFoldingFilterFactory"/>
           <filter class="solr.SynonymFilterFactory" synonyms="syn.txt" ignoreCase="true" expand="false"/>
           <filter class="solr.CJKWidthFilterFactory"/>
           <filter class="solr.CJKBigramFilterFactory"/> 
-          <filter class="solr.TrimFilterFactory"/>
-          <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
     </fieldtype>
     
     <fieldtype name="text_l" class="solr.TextField" positionIncrementGap="1000">
       <analyzer>
+        <charFilter class="solr.PatternReplaceCharFilterFactory"
+          pattern="^(.*)$" replacement="AAAA $1" />       
         <tokenizer class="solr.ICUTokenizerFactory"/>
           <filter class="solr.ICUFoldingFilterFactory"/>
           <filter class="solr.SynonymFilterFactory" synonyms="syn.txt" ignoreCase="true" expand="false"/>
           <filter class="solr.CJKWidthFilterFactory"/>
           <filter class="solr.CJKBigramFilterFactory"/> 
-          <filter class="solr.TrimFilterFactory"/>
-          <filter class="solr.PatternReplaceFilterFactory"
-                    pattern="\p{Z}+" replacement=" "
-          />
-          <charFilter class="solr.PatternReplaceCharFilterFactory"
-            pattern="^(.*)$" replacement="AAAA $1" />       
-          <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
     </fieldtype>
     
